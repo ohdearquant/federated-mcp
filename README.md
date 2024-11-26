@@ -31,33 +31,7 @@ Model Context Protocol (MCP) with Federation Support
 - MCP Servers: Programs providing federated resource access
 - MCP Clients: Components maintaining federated connections
 - Federation Proxy: Manages cross-server authentication
-
-graph TD
-    %% Client Nodes
-    A[MCP Client] -->|JSON-RPC| C[Federation Proxy]
-    %% Federation Proxy
-    C -->|Route & Auth| F[Federation Manager]
-    %% Federation Manager
-    F -->|Manage Connections| G[MCP Server]
-    F -->|Manage Connections| H[Resource Server]
-    F -->|External Federation| I[Cloud Service]
-    %% Servers
-    G --> J[Data Source 1]
-    H --> K[Data Source 2]
-    I --> L[Shared Tool Integration]
-    %% External Communications
-    L -->|Integration APIs| M[[External APIs]]
-
-    %% Styles
-    classDef client fill:#f9f,stroke:#333,stroke-width:2px;
-    classDef server fill:#bbf,stroke:#333,stroke-width:2px;
-    classDef proxy fill:#ff9,stroke:#333,stroke-width:2px;
-
-    class A,G,H client;
-    class C,F proxy;
-    class I,J,K,L server;
-
-
+ 
 ## Real-World Applications
 
 **Implementation Areas**:
