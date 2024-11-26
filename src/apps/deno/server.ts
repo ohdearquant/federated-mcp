@@ -25,6 +25,16 @@ async function viewEdgeFunctionLogs() {
     if (stats.selectedProvider === 'supabase') {
       for (const func of stats.activeEdgeFunctions) {
         console.log(`\n\x1b[33m${func} Logs:\x1b[0m`);
+        const logs = await supabaseDeployer.getFunctionLogs(func);
+        logs.forEach(log => console.log(log));
+      }
+    } else {
+      console.log('\x1b[31m✗ Logs not supported for current provider\x1b[0m');
+    }
+  } else {
+    console.log('\x1b[31m✗ No active edge functions\x1b[0m');
+  }
+}
   requiredEnvVars: { name: string; description: string }[];
   isConfigured: () => boolean;
 }
