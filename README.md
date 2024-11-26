@@ -1,8 +1,8 @@
 # Complete implementation following the official MCP specification:
 
-The Model Context Protocol (MCP) enables federated connections between AI systems and various data sources through a standardized architecture. Here’s a complete implementation following the official specification:
+The Model Context Protocol (MCP) enables federated connections between AI systems and various data sources through a standardized architecture. Here's a complete implementation following the official specification:
 
-This implementation provides a foundation for building federated MCP systems that can scale across multiple servers while maintaining the protocol’s security and standardization requirements. The federation layer enables seamless communication between different MCP servers, allowing AI systems to maintain context while moving between different tools and datasets.
+This implementation provides a foundation for building federated MCP systems that can scale across multiple servers while maintaining the protocol's security and standardization requirements. The federation layer enables seamless communication between different MCP servers, allowing AI systems to maintain context while moving between different tools and datasets.
 
 The implementation supports both local and remote connections through multiple transport mechanisms, including stdio for local process communication and HTTP with Server-Sent Events for remote connections. 
 
@@ -23,6 +23,23 @@ Model Context Protocol (MCP) with Federation Support
 - Federation Controller: Manages cross-server communication
 - Proxy Layer: Handles authentication between federated servers
 - Identity Management: Controls access across federated instances
+
+```mermaid
+graph TD
+    A[AI System] --> B[Federation Controller]
+    B --> C[Proxy Layer]
+    C --> D[MCP Server 1]
+    C --> E[MCP Server 2]
+    C --> F[MCP Server N]
+    B --> G[Identity Management]
+    G --> H[Auth Service]
+    D --> I[Data Source 1]
+    E --> J[Data Source 2]
+    F --> K[Data Source N]
+    style B fill:#f9f,stroke:#333
+    style C fill:#bbf,stroke:#333
+    style G fill:#bfb,stroke:#333
+```
 
 ## Basic Structure
 
