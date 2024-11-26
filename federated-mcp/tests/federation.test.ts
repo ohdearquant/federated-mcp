@@ -1,106 +1,80 @@
-import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
-import { FederationProxy } from "../packages/proxy/federation.ts";
-import { FederationConfig } from "../packages/core/types.ts";
-import { serve } from "https://deno.land/std/http/server.ts";
+import { FederationProxy } from "../packages/proxy/federation";
+import { FederationConfig } from "../packages/core/types";
+import WebSocket from 'ws';
 
 const TEST_SECRET = "test-secret-key";
 const WS_PORT = 3000;
 
 async function setupMockServer() {
-  const ac = new AbortController();
-  const { signal } = ac;
-
-  const handler = async (req: Request): Promise<Response> => {
-    if (req.headers.get("upgrade") === "websocket") {
-      const { socket, response } = Deno.upgradeWebSocket(req);
-      socket.onopen = () => {
-        console.log("WebSocket connected");
-      };
-      socket.onclose = () => {
-        console.log("WebSocket closed");
-      };
-      return response;
-    }
-    return new Response("Not a websocket request", { status: 400 });
-  };
-
-  // Start the server and wait for it to be ready
-  const serverPromise = serve(handler, { port: WS_PORT, signal });
+  const wss = new WebSocket.Server({ port: WS_PORT });
   
+  wss.on('connection', (ws) => {
+    console.log("WebSocket connected");
+    ws.on('close', () => console.log("WebSocket closed"));
+  });
+
   // Wait for the server to be ready
-  await new Promise(resolve => setTimeout(resolve, 100));
+  await new Promise(resolve => wss.once('listening', resolve));
 
   return {
     close: () => {
-      ac.abort();
+      return new Promise(resolve => wss.close(resolve));
     }
   };
 }
 
-Deno.test({
-  name: "Federation Proxy - Server Registration",
-  async fn() {
-    const mockServer = await setupMockServer();
-    try {
-      const proxy = new FederationProxy(TEST_SECRET);
-      
-      const config: FederationConfig = {
-        serverId: "test-server",
-        endpoints: {
-          control: `ws://localhost:${WS_PORT}`,
-          data: "http://localhost:3001",
-        },
-        auth: {
-          type: "jwt",
-          config: { secret: TEST_SECRET }
-        }
-      };
+describe("Federation Proxy", () => {
+  let mockServer: { close: () => Promise<void> };
 
-      await proxy.registerServer(config);
-      
-      const servers = proxy.getConnectedServers();
-      assertEquals(servers.length, 1, "Should have one registered server");
-      assertEquals(servers[0], "test-server", "Server ID should match");
-    } finally {
-      mockServer.close();
-      // Wait for cleanup
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-  },
-  sanitizeResources: false,
-  sanitizeOps: false
-});
+  beforeEach(async () => {
+    mockServer = await setupMockServer();
+  });
 
-Deno.test({
-  name: "Federation Proxy - Server Removal",
-  async fn() {
-    const mockServer = await setupMockServer();
-    try {
-      const proxy = new FederationProxy(TEST_SECRET);
-      
-      const config: FederationConfig = {
-        serverId: "test-server",
-        endpoints: {
-          control: `ws://localhost:${WS_PORT}`,
-          data: "http://localhost:3001",
-        },
-        auth: {
-          type: "jwt",
-          config: { secret: TEST_SECRET }
-        }
-      };
+  afterEach(async () => {
+    await mockServer.close();
+  });
 
-      await proxy.registerServer(config);
-      await proxy.removeServer("test-server");
-      
-      const servers = proxy.getConnectedServers();
-      assertEquals(servers.length, 0, "Should have no registered servers after removal");
-    } finally {
-      mockServer.close();
-      // Wait for cleanup
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-  },
-  sanitizeResources: false,
-  sanitizeOps: false
+  test("Server Registration", async () => {
+    const proxy = new FederationProxy(TEST_SECRET);
+    
+    const config: FederationConfig = {
+      serverId: "test-server",
+      endpoints: {
+        control: `ws://localhost:${WS_PORT}`,
+        data: "http://localhost:3001",
+      },
+      auth: {
+        type: "jwt",
+        config: { secret: TEST_SECRET }
+      }
+    };
+
+    await proxy.registerServer(config);
+    
+    const servers = proxy.getConnectedServers();
+    expect(servers.length).toBe(1);
+    expect(servers[0]).toBe("test-server");
+  });
+
+  test("Server Removal", async () => {
+    const proxy = new FederationProxy(TEST_SECRET);
+    
+    const config: FederationConfig = {
+      serverId: "test-server",
+      endpoints: {
+        control: `ws://localhost:${WS_PORT}`,
+        data: "http://localhost:3001",
+      },
+      auth: {
+        type: "jwt",
+        config: { secret: TEST_SECRET }
+      }
+    };
+
+    await proxy.registerServer(config);
+    await proxy.removeServer("test-server");
+    
+    const servers = proxy.getConnectedServers();
+    expect(servers.length).toBe(0);
+  });
 });
