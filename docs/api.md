@@ -18,6 +18,10 @@ The main class for managing federated server connections.
 constructor(secret: string)
 ```
 
+```python
+def __init__(self, secret: str)
+```
+
 Parameters:
 - `secret: string` - The secret key used for JWT token generation and validation
 
@@ -26,12 +30,20 @@ Example:
 const proxy = new FederationProxy("your-secret-key");
 ```
 
+```python
+proxy = FederationProxy("your-secret-key")
+```
+
 #### Method: registerServer
 
 Registers a new server in the federation network.
 
 ```typescript
 async registerServer(config: FederationConfig): Promise<void>
+```
+
+```python
+async def register_server(self, config: FederationConfig) -> None
 ```
 
 Parameters:
@@ -52,12 +64,30 @@ await proxy.registerServer({
 });
 ```
 
+```python
+await proxy.register_server({
+  "server_id": "server-1",
+  "endpoints": {
+    "control": "ws://localhost:3000",
+    "data": "http://localhost:3001"
+  },
+  "auth": {
+    "type": "jwt",
+    "config": { "secret": "your-secret-key" }
+  }
+})
+```
+
 #### Method: removeServer
 
 Removes a server from the federation network.
 
 ```typescript
 async removeServer(serverId: string): Promise<void>
+```
+
+```python
+async def remove_server(self, server_id: str) -> None
 ```
 
 Parameters:
@@ -68,12 +98,20 @@ Example:
 await proxy.removeServer("server-1");
 ```
 
+```python
+await proxy.remove_server("server-1")
+```
+
 #### Method: getConnectedServers
 
 Returns an array of connected server IDs.
 
 ```typescript
 getConnectedServers(): string[]
+```
+
+```python
+def get_connected_servers(self) -> List[str]
 ```
 
 Returns:
@@ -83,6 +121,11 @@ Example:
 ```typescript
 const servers = proxy.getConnectedServers();
 console.log("Connected servers:", servers);
+```
+
+```python
+servers = proxy.get_connected_servers()
+print("Connected servers:", servers)
 ```
 
 ## AuthManager API
@@ -97,6 +140,10 @@ Handles authentication and token management.
 constructor(secret: string)
 ```
 
+```python
+def __init__(self, secret: str)
+```
+
 Parameters:
 - `secret: string` - Secret key for token generation and validation
 
@@ -105,12 +152,20 @@ Example:
 const authManager = new AuthManager("your-secret-key");
 ```
 
+```python
+auth_manager = AuthManager("your-secret-key")
+```
+
 #### Method: createToken
 
 Creates a JWT token for server authentication.
 
 ```typescript
 async createToken(payload: Record<string, unknown>): Promise<string>
+```
+
+```python
+def create_token(self, payload: dict) -> str
 ```
 
 Parameters:
@@ -127,12 +182,23 @@ const token = await authManager.createToken({
 });
 ```
 
+```python
+token = auth_manager.create_token({
+  "server_id": "server-1",
+  "type": "federation"
+})
+```
+
 #### Method: verifyToken
 
 Verifies a JWT token.
 
 ```typescript
 async verifyToken(token: string): Promise<Record<string, unknown>>
+```
+
+```python
+def verify_token(self, token: str) -> dict
 ```
 
 Parameters:
@@ -144,6 +210,10 @@ Returns:
 Example:
 ```typescript
 const payload = await authManager.verifyToken(token);
+```
+
+```python
+payload = auth_manager.verify_token(token)
 ```
 
 ## Type Definitions
@@ -164,6 +234,14 @@ interface FederationConfig {
     config: Record<string, unknown>;
   };
 }
+```
+
+```python
+class FederationConfig:
+    def __init__(self, server_id: str, endpoints: dict, auth: dict):
+        self.server_id = server_id
+        self.endpoints = endpoints
+        self.auth = auth
 ```
 
 Fields:
@@ -188,6 +266,15 @@ interface MCPCapabilities {
 }
 ```
 
+```python
+class MCPCapabilities:
+    def __init__(self, resources: bool, prompts: bool, tools: bool, sampling: bool):
+        self.resources = resources
+        self.prompts = prompts
+        self.tools = tools
+        self.sampling = sampling
+```
+
 ### Interface: ServerInfo
 
 Server information structure.
@@ -198,6 +285,14 @@ interface ServerInfo {
   version: string;
   capabilities: MCPCapabilities;
 }
+```
+
+```python
+class ServerInfo:
+    def __init__(self, name: str, version: str, capabilities: MCPCapabilities):
+        self.name = name
+        self.version = version
+        self.capabilities = capabilities
 ```
 
 ## Error Handling
@@ -215,6 +310,17 @@ new Error('Invalid token')
 
 // Server error
 new Error('Server connection failed')
+```
+
+```python
+# Connection timeout error
+raise TimeoutError('Connection timeout')
+
+# Authentication error
+raise ValueError('Invalid token')
+
+# Server error
+raise ConnectionError('Server connection failed')
 ```
 
 ### Error Types
@@ -247,6 +353,18 @@ try {
 }
 ```
 
+```python
+try:
+    await proxy.register_server(config)
+except Exception as error:
+    if 'timeout' in str(error):
+        # Handle timeout error
+    elif 'token' in str(error):
+        # Handle authentication error
+    else:
+        # Handle general error
+```
+
 ## WebSocket Events
 
 ### Connection Events
@@ -265,12 +383,28 @@ ws.onerror = (error) => {
 }
 ```
 
+```python
+async def on_open():
+    # Connection established
+
+async def on_close():
+    # Connection closed
+
+async def on_error(error):
+    # Connection error
+```
+
 ### Message Events
 
 ```typescript
 ws.onmessage = (event) => {
   // Handle incoming message
 }
+```
+
+```python
+async def on_message(event):
+    # Handle incoming message
 ```
 
 ## Best Practices
@@ -285,6 +419,14 @@ ws.onmessage = (event) => {
    }
    ```
 
+   ```python
+   try:
+       await proxy.register_server(config)
+   except Exception as error:
+       print('Registration failed:', error)
+       # Implement retry logic or fallback
+   ```
+
 2. **Connection Management**
    ```typescript
    const servers = proxy.getConnectedServers();
@@ -293,12 +435,25 @@ ws.onmessage = (event) => {
    }
    ```
 
+   ```python
+   servers = proxy.get_connected_servers()
+   if server_id in servers:
+       await proxy.remove_server(server_id)
+   ```
+
 3. **Token Management**
    ```typescript
    const token = await authManager.createToken({
      serverId,
      exp: Math.floor(Date.now() / 1000) + (60 * 60) // 1 hour expiration
    });
+   ```
+
+   ```python
+   token = auth_manager.create_token({
+       "server_id": server_id,
+       "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+   })
    ```
 
 ## Rate Limiting
@@ -312,6 +467,15 @@ const rateLimits = {
   messages: 1000,      // Messages per minute
   tokens: 100         // Token generations per minute
 };
+```
+
+```python
+# Example rate limit configuration
+rate_limits = {
+    "connections": 100,    # Max concurrent connections
+    "messages": 1000,      # Messages per minute
+    "tokens": 100          # Token generations per minute
+}
 ```
 
 ## Security Considerations
