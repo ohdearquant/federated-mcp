@@ -114,6 +114,28 @@ graph TD
 deno run --allow-net --allow-env --allow-read --allow-write --allow-run src/apps/deno/server.ts
 ```
 
+## Python Implementation
+
+The repository now includes Python translations of the TypeScript code for `FederationProxy` and `AuthManager` classes.
+
+### Python Files
+
+- `src/packages/proxy/federation.py`: Contains the Python implementation of `FederationProxy`.
+- `src/packages/core/auth.py`: Contains the Python implementation of `AuthManager`.
+- `src/packages/core/server.py`: Contains the Python implementation of `MCPServer`.
+- `src/packages/edge/intent-detection.py`: Contains the Python implementation of intent detection functionality.
+- `src/packages/edge/meeting-info.py`: Contains the Python implementation of meeting information retrieval functionality.
+- `src/packages/edge/webhook-handler.py`: Contains the Python implementation of webhook handling functionality.
+- `src/packages/core/schema.py`: Contains the Python implementation of JSON-RPC types.
+- `src/packages/core/types.py`: Contains the Python implementation of core protocol types.
+
+### Running the Python Server
+
+```bash
+# Run the Python server
+python src/packages/core/server.py
+```
+
 ## License
 
 MIT License - See LICENSE file for details.

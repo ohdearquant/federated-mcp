@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "weather": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "path/to/your/project",
+        "run",
+        "weather-service"
+      ],
+      "env": {
+        "OPENWEATHER_API_KEY": "your-api-key"
+      }
+    }
+  }
+}
