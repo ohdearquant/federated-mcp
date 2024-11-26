@@ -65,7 +65,7 @@ Multiple network protocols are supported:
 
 ### AI Model Integration
 Support for various AI models:
-- GPT-3.5 and GPT-4 integration
+- Ai integration
 - Custom model support
 - Model-agnostic interfaces
 - Extensible model architecture
