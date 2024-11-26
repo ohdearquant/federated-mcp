@@ -361,4 +361,5 @@ displayServerStatus();
 handleKeypress();
 
 // Start the server
-await serve(handler, { port: 3000 });
+const server = Deno.serve({ port: 3000 }, handler);
+await server.finished;
