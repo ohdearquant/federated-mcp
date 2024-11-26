@@ -27,13 +27,13 @@ function formatJSON(obj: any, indent = 0): string {
   const spaces = '  '.repeat(indent);
   const nextSpaces = '  '.repeat(indent + 1);
   const colors = {
-    key: '\x1b[38;5;141m',    // Purple for keys
-    string: '\x1b[38;5;117m', // Light blue for strings
-    number: '\x1b[38;5;208m', // Orange for numbers
-    boolean: '\x1b[38;5;149m',// Green for booleans
-    null: '\x1b[38;5;246m',   // Gray for null
-    bracket: '\x1b[38;5;247m',// Light gray for brackets
-    comma: '\x1b[38;5;240m',  // Dark gray for commas
+    key: '\x1b[38;5;51m',     // Cyan for keys
+    string: '\x1b[38;5;87m',  // Light cyan for strings
+    number: '\x1b[38;5;207m', // Pink for numbers
+    boolean: '\x1b[38;5;219m',// Light pink for booleans
+    null: '\x1b[38;5;243m',   // Dark gray for null
+    bracket: '\x1b[38;5;39m', // Blue for brackets
+    comma: '\x1b[38;5;45m',   // Bright cyan for commas
     reset: '\x1b[0m'
   };
   
@@ -130,8 +130,12 @@ async function handleKeypress() {
         break;
         
       case '2':
-        console.log('\n\x1b[38;5;51m▀▀▀ SYSTEM INFORMATION ▀▀▀\x1b[0m');
+        console.log('\n\x1b[38;5;51m╔══════════════════════════════════╗\x1b[0m');
+        console.log('\x1b[38;5;51m║     SYSTEM CORE INFORMATION      ║\x1b[0m');
+        console.log('\x1b[38;5;51m╚══════════════════════════════════╝\x1b[0m');
+        console.log('\x1b[38;5;117m<< INITIATING DATA STREAM >>\x1b[0m\n');
         console.log(formatJSON(serverInfo));
+        console.log('\n\x1b[38;5;117m<< END TRANSMISSION >>\x1b[0m');
         break;
         
       case '3':
@@ -207,7 +211,7 @@ async function handleKeypress() {
         break;
     }
     
-    console.log('\n\x1b[38;5;51m▶ Enter command [1-9]:\x1b[0m');
+    console.log('\n\x1b[38;5;51m[SYS]>\x1b[38;5;87m AWAITING INPUT\x1b[38;5;51m [1-9]:\x1b[0m');
   }
 }
 
