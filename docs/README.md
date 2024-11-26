@@ -37,6 +37,12 @@ Welcome to the Federated MCP documentation. This documentation provides comprehe
    - Code Style
    - Release Process
 
+6. [Edge Functions](./edge_functions.md)
+   - Available Functions
+   - Provider Configuration
+   - Deployment Guide
+   - Monitoring & Logs
+
 ## Quick Start
 
 ```typescript
