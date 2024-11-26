@@ -1,14 +1,16 @@
-export interface MCPCapabilities {
-  resources: boolean;
-  prompts: boolean;
-  tools: boolean;
-  sampling: boolean;
-}
+import { 
+  Capabilities,
+  ServerInfo as MCPServerInfo,
+  Message,
+  Response
+} from '@modelcontextprotocol/typescript-sdk';
 
-export interface ServerInfo {
+export { Capabilities, Message, Response };
+
+export interface ServerInfo extends MCPServerInfo {
   name: string;
   version: string;
-  capabilities: MCPCapabilities;
+  capabilities: Capabilities;
 }
 
 export interface FederationConfig {

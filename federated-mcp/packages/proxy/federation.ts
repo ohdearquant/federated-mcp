@@ -1,15 +1,29 @@
-import { FederationConfig } from '../core/types.ts';
-import { AuthManager } from '../core/auth.ts';
+import { 
+  MCPClient,
+  Message,
+  Response,
+  Capabilities
+} from '@modelcontextprotocol/typescript-sdk';
+import { FederationConfig } from '../core/types';
+import { AuthManager } from '../core/auth';
 
 export class FederationProxy {
   private servers: Map<string, FederationConfig>;
   private authManager: AuthManager;
-  private connections: Map<string, WebSocket>;
+  private connections: Map<string, MCPClient>;
 
   constructor(secret: string) {
     this.servers = new Map();
     this.connections = new Map();
     this.authManager = new AuthManager(secret);
+  }
+
+  async getServerCapabilities(serverId: string): Promise<Capabilities> {
+    const client = this.connections.get(serverId);
+    if (!client) {
+      throw new Error(`Server ${serverId} not connected`);
+    }
+    return await client.getCapabilities();
   }
 
   async registerServer(config: FederationConfig): Promise<void> {
@@ -33,43 +47,36 @@ export class FederationProxy {
         type: 'federation'
       });
 
-      // Append token as query parameter
-      const wsUrl = new URL(config.endpoints.control);
-      wsUrl.searchParams.set('token', token);
+      const client = new MCPClient({
+        endpoint: config.endpoints.control,
+        token,
+        timeout: 5000
+      });
+
+      await client.connect();
       
-      return new Promise((resolve, reject) => {
-        const ws = new WebSocket(wsUrl.toString());
+      // Verify capabilities match configuration
+      const capabilities = await client.getCapabilities();
+      if (!this.validateCapabilities(capabilities, config)) {
+        throw new Error('Server capabilities do not match configuration');
+      }
 
-        ws.onopen = () => {
-          console.log(`Connected to server ${config.serverId}`);
-          this.connections.set(config.serverId, ws);
-          resolve();
-        };
-
-        ws.onclose = () => {
-          console.log(`Disconnected from server ${config.serverId}`);
-          this.connections.delete(config.serverId);
-        };
-
-        ws.onerror = (error) => {
-          console.error(`Error with server ${config.serverId}:`, error);
-          reject(error);
-        };
-
-        // Set a connection timeout
-        const timeout = setTimeout(() => {
-          ws.close();
-          reject(new Error('Connection timeout'));
-        }, 5000);
-
-        // Clear timeout on successful connection
-        ws.addEventListener('open', () => clearTimeout(timeout));
+      this.connections.set(config.serverId, client);
+      
+      client.onDisconnect(() => {
+        console.log(`Disconnected from server ${config.serverId}`);
+        this.connections.delete(config.serverId);
       });
 
     } catch (error) {
       console.error(`Failed to establish connection with ${config.serverId}:`, error);
       throw error;
     }
+  }
+
+  private validateCapabilities(actual: Capabilities, config: FederationConfig): boolean {
+    // Implement capability validation logic based on your requirements
+    return true;
   }
 
   getConnectedServers(): string[] {
