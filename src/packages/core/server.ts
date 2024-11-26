@@ -1,7 +1,5 @@
 import { ServerInfo, Capabilities, Message, Response as MCPResponse } from './types.ts';
 
-export { MCPServer };
-
 interface ConsoleOptions {
   showTimestamp?: boolean;
   logLevel?: 'debug' | 'info' | 'warn' | 'error';

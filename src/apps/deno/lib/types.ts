@@ -1,4 +1,6 @@
-import { ServerInfo } from "../../../../packages/core/types.ts";
+/// <reference lib="deno.ns" />
+
+import { ServerInfo } from "../../../packages/core/types.ts";
 
 export interface ServerStats {
   connections: number;
