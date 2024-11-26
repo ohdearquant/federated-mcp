@@ -1,5 +1,5 @@
-import { FederationConfig } from '../core/types';
-import { AuthManager } from '../core/auth';
+import { FederationConfig } from '../core/types.ts';
+import { AuthManager } from '../core/auth.ts';
 
 export class FederationProxy {
   private servers: Map<string, FederationConfig>;
@@ -33,25 +33,38 @@ export class FederationProxy {
         type: 'federation'
       });
 
-      const ws = new WebSocket(config.endpoints.control, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      // Append token as query parameter
+      const wsUrl = new URL(config.endpoints.control);
+      wsUrl.searchParams.set('token', token);
+      
+      return new Promise((resolve, reject) => {
+        const ws = new WebSocket(wsUrl.toString());
+
+        ws.onopen = () => {
+          console.log(`Connected to server ${config.serverId}`);
+          this.connections.set(config.serverId, ws);
+          resolve();
+        };
+
+        ws.onclose = () => {
+          console.log(`Disconnected from server ${config.serverId}`);
+          this.connections.delete(config.serverId);
+        };
+
+        ws.onerror = (error) => {
+          console.error(`Error with server ${config.serverId}:`, error);
+          reject(error);
+        };
+
+        // Set a connection timeout
+        const timeout = setTimeout(() => {
+          ws.close();
+          reject(new Error('Connection timeout'));
+        }, 5000);
+
+        // Clear timeout on successful connection
+        ws.addEventListener('open', () => clearTimeout(timeout));
       });
-
-      ws.onopen = () => {
-        console.log(`Connected to server ${config.serverId}`);
-        this.connections.set(config.serverId, ws);
-      };
-
-      ws.onclose = () => {
-        console.log(`Disconnected from server ${config.serverId}`);
-        this.connections.delete(config.serverId);
-      };
-
-      ws.onerror = (error) => {
-        console.error(`Error with server ${config.serverId}:`, error);
-      };
 
     } catch (error) {
       console.error(`Failed to establish connection with ${config.serverId}:`, error);
