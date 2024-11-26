@@ -372,6 +372,6 @@ displayServerStatus();
 // Start keyboard input handler
 handleKeypress();
 
-// Start the server
-const server = Deno.serve({ port: 3000 }, handler);
-await server.finished;
+// Start the HTTP server
+const httpServer = Deno.serve({ port: 3000 }, handler);
+await httpServer.finished;
