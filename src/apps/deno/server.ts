@@ -35,6 +35,8 @@ async function viewEdgeFunctionLogs() {
     console.log('\x1b[31m✗ No active edge functions\x1b[0m');
   }
 }
+interface EdgeProviderConfig {
+  name: string;
   requiredEnvVars: { name: string; description: string }[];
   isConfigured: () => boolean;
 }
