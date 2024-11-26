@@ -92,6 +92,10 @@ const edgeProviders: Record<string, EdgeProviderConfig> = {
   }
 };
 
+import { MCPServer } from "../../../packages/core/server.ts";
+import { ServerInfo } from "../../../packages/core/types.ts";
+import { SupabaseDeployer } from "../../../packages/edge/supabase-deploy.ts";
+
 const server = new MCPServer(serverInfo);
 const supabaseDeployer = new SupabaseDeployer();
 
